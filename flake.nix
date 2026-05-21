@@ -16,7 +16,7 @@
   let
 
       system = "x86_64-linux";
-  pkgs = import nixpkgs { config.allowUnfree = true; inherit system;};
+      pkgs = import nixpkgs { config.allowUnfree = true; inherit system;};
   in 
   {
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {

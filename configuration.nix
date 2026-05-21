@@ -33,6 +33,13 @@
 
   networking.networkmanager.wifi.powersave = false;
 
+  # networking.wireless.userControlled.enable = true;
+
+  # powerManagement.resumeCommands = ''
+  #   sleep 2
+  #   ${pkgs.networkmanager}/bin/nmcli device reapply wlp0s20f3 || true
+  # '';
+
   # Set your time zone.
   time.timeZone = "America/New_York";
 
@@ -145,34 +152,54 @@
     wget
     fastfetch
     vesktop
+    discord
     btop
     gparted
     git
+    uv
+    rclone
 
     inputs.nix-index-database.packages."${system}".comma-with-db
+
+    (pkgs.wrapOBS {
+      plugins = with pkgs.obs-studio-plugins; [
+        wlrobs
+        obs-backgroundremoval
+        obs-pipewire-audio-capture
+        obs-vaapi #optional AMD hardware acceleration
+        obs-gstreamer
+        obs-vkcapture
+      ];
+    })
 
   # nix-specific
     comma
   # work
     tailscale
   # languages 
-    racket
+    ## racket
+    ## gprolog
   # txt editors and IDEs
-    # libre office
-      hunspellDicts.en-us
+    # onlyoffice
+      pkgs.onlyoffice-desktopeditors
     # Obsidian
       obsidian
-    # codium
-      vscodium
-    # Eclipse and dependencies (C/C++)
-      eclipses.eclipse-cpp
-      gcc
-      gdb
-      gnumake
-    # video
-      vlc
+
+  # codium
+    vscodium
+  # languages
+    nodejs
+    jdk
+  # Eclipse and dependencies (C/C++)
+    ## eclipses.eclipse-cpp
+    ## gcc
+    ## gdb
+    ## gnumake
+  # video
+    vlc
   # Browsers 
     brave
+    vivaldi
   # spotify
     spotify
   # packet analysis
@@ -225,6 +252,11 @@
   };
 
   users.defaultUserShell = pkgs.zsh;
+
+  programs.neovim = {
+    enable = true;
+    defaultEditor = false;
+  };
 
   # Enable automatic store optimization
   nix.settings.auto-optimise-store = true;

@@ -8,6 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      # inputs.nixcord.nixosModules.nixcord
     ];
 
   # systemd-boot
@@ -141,7 +142,16 @@
   # nixpkgs.config.allowUnfree = true;
 
   # Tailscale
-  services.tailscale.enable = true;
+  services.tailscale = {
+	enable = true;
+	/*
+	useRoutingFeatures = "none"; 
+	extraUpFlags = [
+    	  "--accept-dns=false"  # manage DNS yourself if needed
+	  "--accept-routes=false"
+  	];
+	*/
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -150,14 +160,21 @@
 
   # tool
     wget
-    fastfetch
-    vesktop
-    discord
+    fastfetch 
     btop
+    (vesktop.overrideAttrs (old: {
+      patches = (old.patches or []) ++ [
+        (fetchpatch {
+          url = "https://github.com/Vencord/Vesktop/pull/1251.patch";
+          hash = "sha256-WmnXRISB1vfnbvSXJlD6sGkl5HSBTHpye+ezLyidtHU=";
+        })
+      ];
+    }))
     gparted
     git
     uv
     rclone
+    # ethtool
 
     inputs.nix-index-database.packages."${system}".comma-with-db
 
@@ -234,7 +251,12 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.nftables.enable = true;
+
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ "tailscale0" ];
+  }; 
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -273,5 +295,9 @@
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
     localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
+    ];
   };
 }

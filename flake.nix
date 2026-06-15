@@ -8,6 +8,8 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # nixcord.url = "github:FlameFlag/nixcord"; 
   };
 
   
